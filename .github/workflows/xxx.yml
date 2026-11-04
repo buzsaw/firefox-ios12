@@ -1,0 +1,11 @@
+
+name: 占位用workflow
+
+on:
+  workflow_dispatch:
+
+jobs:
+  占位任务:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "这是占位工作流程"
