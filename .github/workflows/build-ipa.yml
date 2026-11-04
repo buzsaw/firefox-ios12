@@ -2,9 +2,7 @@ name: Build sideload IPA
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - sideload-jitless
+
 permissions:
   contents: read
 
