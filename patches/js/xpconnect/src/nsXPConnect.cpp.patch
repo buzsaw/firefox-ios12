@@ -15,7 +15,7 @@ index fc50c3260009..d0c6776f705c 100644
 +  // here; if executable memory can't be reserved (ptrace helper failed to
 +  // mark the process CS_DEBUGGED), JitContext degrades to the interpreter
 +  // instead of failing JS_Init.
-+  const bool disableMainProcessJIT = false;
++  const bool disableMainProcessJIT = true;
 +#else
 +  const bool disableMainProcessJIT =
 +      XRE_IsParentProcess() &&
