@@ -12,7 +12,9 @@ permissions:
 jobs:
   build:
     runs-on: macos-26
-    timeout-minutes: 720
+    timeout-minutes: 360
+    env:
+      SCCACHE_GHA_ENABLED: "true"
     steps:
       - name: Check out selected branch
         uses: actions/checkout@v4
@@ -52,12 +54,30 @@ jobs:
         with:
           targets: aarch64-apple-ios
 
+      - name: Hash Rust toolchain for cache
+        id: rust_toolchain
+        run: echo "hash=$(rustc -Vv | shasum -a 256 | cut -d ' ' -f 1)" >> "$GITHUB_OUTPUT"
+
+      - name: Restore Gecko dependency cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            ~/.mozbuild
+          key: ios12-gecko-deps-${{ steps.rust_toolchain.outputs.hash }}-${{ hashFiles('engine/release.txt') }}
+          restore-keys: |
+            ios12-gecko-deps-${{ steps.rust_toolchain.outputs.hash }}-
+
+      - name: Set up sccache
+        uses: mozilla-actions/sccache-action@v0.0.11
+
       - name: Build Gecko
         env:
           CC: clang
           CXX: clang++
           LD: ld64.lld
-        run: ./tools/development/build-gecko.sh
+        run: ./tools/development/build-gecko.sh --use-sccache --auto-clobber
 
       - name: Build idevice support library
         run: ./tools/development/build-idevice.sh
